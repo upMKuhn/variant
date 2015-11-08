@@ -117,8 +117,23 @@ namespace eggs { namespace variants { namespace detail
     using typed_index_pack = typename _typed_index_pack<Ts>::type;
 
     ///////////////////////////////////////////////////////////////////////////
+    template <bool C, typename ...Ts>
+    struct _all_of
+      : std::integral_constant<bool, C>
+    {};
+
+    template <typename T, typename ...Ts>
+    struct _all_of<true, T, Ts...>
+      : _all_of<T::value, Ts...>
+    {};
+
     template <typename Vs>
     struct all_of;
+
+    template <typename ...Ts>
+    struct all_of<pack<Ts...>>
+      : _all_of<true, Ts...>
+    {};
 
     template <bool ...Vs>
     struct all_of<pack_c<bool, Vs...>>
@@ -131,25 +146,34 @@ namespace eggs { namespace variants { namespace detail
         >
     {};
 
-    template <typename ...Ts>
-    struct all_of<pack<Ts...>>
-      : all_of<pack_c<bool, (Ts::value)...>>
+    ///////////////////////////////////////////////////////////////////////////
+    template <bool C, typename ...Ts>
+    struct _any_of
+      : std::integral_constant<bool, C>
+    {};
+
+    template <typename T, typename ...Ts>
+    struct _any_of<false, T, Ts...>
+      : _any_of<T::value, Ts...>
     {};
 
     template <typename ...Vs>
     struct any_of;
 
+    template <typename ...Ts>
+    struct any_of<pack<Ts...>>
+      : _any_of<false, Ts...>
+    {};
+
     template <bool ...Vs>
     struct any_of<pack_c<bool, Vs...>>
       : std::integral_constant<
             bool
-          , !all_of<pack_c<bool, !Vs...>>::value
+          , !std::is_same<
+                pack_c<bool, Vs...>
+              , pack_c<bool, (Vs || false)...> // false...
+            >::value
         >
-    {};
-
-    template <typename ...Ts>
-    struct any_of<pack<Ts...>>
-      : any_of<pack_c<bool, (Ts::value)...>>
     {};
 
     ///////////////////////////////////////////////////////////////////////////

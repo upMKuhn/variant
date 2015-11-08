@@ -209,18 +209,18 @@ namespace eggs { namespace variants
     class variant
     {
         static_assert(
-            !detail::any_of<detail::pack<
-                std::is_function<Ts>...>>::value
+            !detail::any_of<detail::pack_c<
+                bool, std::is_function<Ts>::value...>>::value
           , "variant member has function type");
 
         static_assert(
-            !detail::any_of<detail::pack<
-                std::is_reference<Ts>...>>::value
+            !detail::any_of<detail::pack_c<
+                bool, std::is_reference<Ts>::value...>>::value
           , "variant member has reference type");
 
         static_assert(
-            !detail::any_of<detail::pack<
-                std::is_void<Ts>...>>::value
+            !detail::any_of<detail::pack_c<
+                bool, std::is_void<Ts>::value...>>::value
           , "variant member has void type");
 
     public:
