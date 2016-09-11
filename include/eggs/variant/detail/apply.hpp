@@ -17,6 +17,9 @@
 #include <eggs/variant/bad_variant_access.hpp>
 
 #include <cstddef>
+#if EGGS_CXX17_STD_HAS_INVOKE
+#include <functional>
+#endif
 #include <type_traits>
 #include <utility>
 
@@ -25,6 +28,16 @@
 namespace eggs { namespace variants { namespace detail
 {
     ///////////////////////////////////////////////////////////////////////////
+#if EGGS_CXX17_STD_HAS_INVOKE
+    template <typename F, typename ...Ts>
+    EGGS_CXX11_CONSTEXPR auto _invoke(F&& f, Ts&&... vs)
+        EGGS_CXX11_NOEXCEPT_IF(EGGS_CXX11_NOEXCEPT_EXPR(
+            std::invoke(detail::forward<F>(f), detail::forward<Ts>(vs)...)))
+     -> decltype(std::invoke(detail::forward<F>(f), detail::forward<Ts>(vs)...))
+    {
+        return std::invoke(detail::forward<F>(f), detail::forward<Ts>(vs)...);
+    }
+#else
     template <typename F, typename ...Ts>
     EGGS_CXX11_CONSTEXPR auto _invoke(F&& f, Ts&&... vs)
         EGGS_CXX11_NOEXCEPT_IF(EGGS_CXX11_NOEXCEPT_EXPR(
@@ -34,7 +47,7 @@ namespace eggs { namespace variants { namespace detail
         return detail::forward<F>(f)(detail::forward<Ts>(vs)...);
     }
 
-#if EGGS_CXX11_HAS_SFINAE_FOR_EXPRESSIONS
+#  if EGGS_CXX11_HAS_SFINAE_FOR_EXPRESSIONS
     template <typename F, typename T0, typename ...Ts>
     EGGS_CXX11_CONSTEXPR auto _invoke(F&& f, T0&& v0, Ts&&... vs)
         EGGS_CXX11_NOEXCEPT_IF(EGGS_CXX11_NOEXCEPT_EXPR(
@@ -66,6 +79,7 @@ namespace eggs { namespace variants { namespace detail
     {
         return (*v0).*f;
     }
+#  endif
 #endif
 
     ///////////////////////////////////////////////////////////////////////////

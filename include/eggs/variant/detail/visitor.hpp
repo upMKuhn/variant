@@ -227,6 +227,9 @@ namespace eggs { namespace variants { namespace detail
     };
 
     ///////////////////////////////////////////////////////////////////////////
+#if EGGS_CXX17_STD_HAS_CONSTEXPR_ADDRESSOF
+    using std::addressof;
+#else
     namespace _addressof
     {
         struct _fallback {};
@@ -260,6 +263,7 @@ namespace eggs { namespace variants { namespace detail
     {
         return std::addressof(r);
     }
+#endif
 
     template <typename T, typename Union>
     struct target
