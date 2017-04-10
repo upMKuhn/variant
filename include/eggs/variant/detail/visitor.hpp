@@ -277,13 +277,12 @@ namespace eggs { namespace variants { namespace detail
     struct target
       : visitor<target<T, Union>, T*(Union&)>
     {
-        static EGGS_CXX11_CONSTEXPR T* _impl(T& m)
+        static EGGS_CXX11_CONSTEXPR T* _impl(T* mp)
         {
-            return detail::addressof(m);
+            return mp;
         }
 
-        template <typename U>
-        static EGGS_CXX11_CONSTEXPR T* _impl(U&)
+        static EGGS_CXX11_CONSTEXPR T* _impl(void*)
         {
             return nullptr;
         }
@@ -291,7 +290,7 @@ namespace eggs { namespace variants { namespace detail
         template <typename I>
         static EGGS_CXX11_CONSTEXPR T* call(Union& u)
         {
-            return target::_impl(u.get(I{}));
+            return target::_impl(detail::addressof(u.get(I{})));
         }
     };
 
@@ -299,13 +298,12 @@ namespace eggs { namespace variants { namespace detail
     struct target<T, Union const>
       : visitor<target<T, Union const>, T const*(Union const&)>
     {
-        static EGGS_CXX11_CONSTEXPR T const* _impl(T const& m)
+        static EGGS_CXX11_CONSTEXPR T const* _impl(T const* mp)
         {
-            return detail::addressof(m);
+            return mp;
         }
 
-        template <typename U>
-        static EGGS_CXX11_CONSTEXPR T const* _impl(U const&)
+        static EGGS_CXX11_CONSTEXPR T const* _impl(void const*)
         {
             return nullptr;
         }
@@ -313,7 +311,7 @@ namespace eggs { namespace variants { namespace detail
         template <typename I>
         static EGGS_CXX11_CONSTEXPR T const* call(Union const& u)
         {
-            return target::_impl(u.get(I{}));
+            return target::_impl(detail::addressof(u.get(I{})));
         }
     };
 }}}
