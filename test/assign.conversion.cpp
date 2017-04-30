@@ -19,7 +19,7 @@
 
 EGGS_CXX11_STATIC_CONSTEXPR std::size_t npos = eggs::variant<>::npos;
 
-#if EGGS_CXX11_HAS_SFINAE_FOR_EXPRESSIONS && EGGS_CXX11_HAS_DELETED_FUNCTIONS
+#if EGGS_CXX11_HAS_SFINAE_FOR_EXPRESSIONS
 struct WeirdAssignment
 {
     WeirdAssignment(long) {}
@@ -215,7 +215,7 @@ TEST_CASE("variant<Ts...>::operator=(T&&)", "[variant.assign]")
             !std::is_assignable<
                 eggs::variant<int, int const>&, int
             >::value));
-#if EGGS_CXX11_HAS_SFINAE_FOR_EXPRESSIONS && EGGS_CXX11_HAS_DELETED_FUNCTIONS
+#if EGGS_CXX11_HAS_SFINAE_FOR_EXPRESSIONS
 #  if !defined(_MSC_FULL_VER) || _MSC_FULL_VER >= 191025206
         CHECK((
             !std::is_assignable<

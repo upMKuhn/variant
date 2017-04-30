@@ -15,7 +15,7 @@
 #include "catch.hpp"
 #include "constexpr.hpp"
 
-#if EGGS_CXX11_HAS_SFINAE_FOR_EXPRESSIONS && EGGS_CXX11_HAS_DELETED_FUNCTIONS
+#if EGGS_CXX11_HAS_SFINAE_FOR_EXPRESSIONS
 struct WeirdConstructor
 {
     WeirdConstructor(int) {}
@@ -81,7 +81,7 @@ TEST_CASE("variant<Ts...>::variant(T&&)", "[variant.cnstr]")
             !std::is_constructible<
                 eggs::variant<int, int const>, int
             >::value));
-#if EGGS_CXX11_HAS_SFINAE_FOR_EXPRESSIONS && EGGS_CXX11_HAS_DELETED_FUNCTIONS
+#if EGGS_CXX11_HAS_SFINAE_FOR_EXPRESSIONS
         CHECK((
             !std::is_constructible<
                 eggs::variant<WeirdConstructor>, long

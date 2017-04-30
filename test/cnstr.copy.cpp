@@ -38,7 +38,6 @@ struct MovableOnly
     MovableOnly& operator=(MovableOnly&&) { return *this; }
 };
 
-#  if EGGS_CXX11_HAS_DELETED_FUNCTIONS
 struct NonCopyConstructible
 {
     NonCopyConstructible() {}
@@ -46,15 +45,12 @@ struct NonCopyConstructible
     NonCopyConstructible& operator=(NonCopyConstructible const&) { return *this; }; // not trivially copyable
 };
 
-#    if EGGS_CXX11_HAS_DEFAULTED_FUNCTIONS
 struct NonCopyConstructibleTrivial
 {
     NonCopyConstructibleTrivial() {}
     NonCopyConstructibleTrivial(NonCopyConstructibleTrivial const&) = delete;
     NonCopyConstructibleTrivial& operator=(NonCopyConstructibleTrivial const&) = default;
 };
-#    endif
-#  endif
 #endif
 
 TEST_CASE("variant<Ts...>::variant(variant<Ts...> const&)", "[variant.cnstr]")
@@ -136,18 +132,14 @@ TEST_CASE("variant<Ts...>::variant(variant<Ts...> const&)", "[variant.cnstr]")
             !std::is_copy_constructible<
                 eggs::variant<MovableOnly>
             >::value));
-#  if EGGS_CXX11_HAS_DELETED_FUNCTIONS
         CHECK((
             !std::is_copy_constructible<
                 eggs::variant<NonCopyConstructible>
             >::value));
-#    if EGGS_CXX11_HAS_DEFAULTED_FUNCTIONS
         CHECK((
             !std::is_copy_constructible<
                 eggs::variant<NonCopyConstructibleTrivial>
             >::value));
-#    endif
-#  endif
 #endif
     }
 }

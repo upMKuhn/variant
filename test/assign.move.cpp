@@ -32,7 +32,7 @@ struct MovableOnly
     MovableOnly& operator=(MovableOnly&& rhs) { x = ::move(rhs.x); return *this; };
 };
 
-#if EGGS_CXX11_HAS_NOEXCEPT && EGGS_CXX11_STD_HAS_IS_NOTHROW_TRAITS
+#if EGGS_CXX11_STD_HAS_IS_NOTHROW_TRAITS
 template <bool NoThrow>
 struct NoThrowMoveAssignable
 {
@@ -50,7 +50,7 @@ struct NoThrowMoveConstructible
 };
 #endif
 
-#if EGGS_CXX11_HAS_SFINAE_FOR_EXPRESSIONS && EGGS_CXX11_HAS_DELETED_FUNCTIONS
+#if EGGS_CXX11_HAS_SFINAE_FOR_EXPRESSIONS
 struct NonCopyAssignable
 {
     NonCopyAssignable() {}
@@ -65,14 +65,12 @@ struct NonCopyConstructible
     NonCopyConstructible& operator=(NonCopyConstructible const&) { return *this; }; // not trivially copyable
 };
 
-#  if EGGS_CXX11_HAS_DEFAULTED_FUNCTIONS
 struct NonCopyAssignableTrivial
 {
     NonCopyAssignableTrivial() {}
     NonCopyAssignableTrivial(NonCopyAssignableTrivial const&) = default;
     NonCopyAssignableTrivial& operator=(NonCopyAssignableTrivial const&) = delete;
 };
-#  endif
 #endif
 
 TEST_CASE("variant<Ts...>::operator=(variant<Ts...>&&)", "[variant.assign]")
@@ -343,7 +341,7 @@ TEST_CASE("variant<Ts...>::operator=(variant<Ts...>&&)", "[variant.assign]")
     }
 #endif
 
-#if EGGS_CXX11_HAS_NOEXCEPT && EGGS_CXX11_STD_HAS_IS_NOTHROW_TRAITS
+#if EGGS_CXX11_STD_HAS_IS_NOTHROW_TRAITS
     // noexcept
     {
         REQUIRE((
@@ -386,7 +384,7 @@ TEST_CASE("variant<Ts...>::operator=(variant<Ts...>&&)", "[variant.assign]")
 
     // sfinae
     {
-#if EGGS_CXX11_HAS_SFINAE_FOR_EXPRESSIONS && EGGS_CXX11_HAS_DELETED_FUNCTIONS
+#if EGGS_CXX11_HAS_SFINAE_FOR_EXPRESSIONS
         CHECK((
             !std::is_move_assignable<
                 eggs::variant<NonCopyAssignable>
@@ -395,12 +393,10 @@ TEST_CASE("variant<Ts...>::operator=(variant<Ts...>&&)", "[variant.assign]")
             !std::is_move_assignable<
                 eggs::variant<NonCopyConstructible>
             >::value));
-#  if EGGS_CXX11_HAS_DEFAULTED_FUNCTIONS
         CHECK((
             !std::is_move_assignable<
                 eggs::variant<NonCopyAssignableTrivial>
             >::value));
-#  endif
 #endif
     }
 }
@@ -423,9 +419,7 @@ TEST_CASE("variant<>::operator=(variant<>&&)", "[variant.assign]")
     CHECK(bool(v2) == false);
     CHECK(v2.which() == v1.which());
 
-#if EGGS_CXX11_HAS_NOEXCEPT
     CHECK((noexcept(v2 = ::move(v1)) == true));
-#endif
 
     // list-initialization
     {

@@ -40,7 +40,7 @@ struct has_swap<
 {};
 #endif
 
-#if EGGS_CXX11_HAS_NOEXCEPT && EGGS_CXX11_STD_HAS_IS_NOTHROW_TRAITS
+#if EGGS_CXX11_STD_HAS_IS_NOTHROW_TRAITS
 template <bool NoThrow>
 struct NoThrowMoveConstructible
 {
@@ -74,7 +74,6 @@ namespace std
 #  endif
 #endif
 
-#if EGGS_CXX11_HAS_DELETED_FUNCTIONS
 struct NonAssignable
 {
     NonAssignable() {}
@@ -84,7 +83,6 @@ struct NonAssignable
 };
 void swap(NonAssignable&, NonAssignable&) {}
 
-#  if EGGS_CXX11_HAS_DEFAULTED_FUNCTIONS
 struct NonAssignableTrivial
 {
     NonAssignableTrivial() {}
@@ -93,7 +91,6 @@ struct NonAssignableTrivial
     ~NonAssignableTrivial() = default;
 };
 void swap(NonAssignableTrivial&, NonAssignableTrivial&) {}
-#  endif
 
 struct NonSwappable
 {
@@ -102,7 +99,6 @@ struct NonSwappable
     NonSwappable& operator=(NonSwappable const&) { return *this; };
 };
 void swap(NonSwappable&, NonSwappable&) = delete;
-#endif
 
 TEST_CASE("variant<Ts...>::swap(variant<Ts...>&)", "[variant.swap]")
 {
@@ -312,7 +308,7 @@ TEST_CASE("variant<Ts...>::swap(variant<Ts...>&)", "[variant.swap]")
 #endif
     }
 
-#if EGGS_CXX11_HAS_NOEXCEPT && EGGS_CXX11_STD_HAS_IS_NOTHROW_TRAITS
+#if EGGS_CXX11_STD_HAS_IS_NOTHROW_TRAITS
     // noexcept
     {
         REQUIRE((
@@ -364,7 +360,6 @@ TEST_CASE("variant<Ts...>::swap(variant<Ts...>&)", "[variant.swap]")
 #endif
 }
 
-#if EGGS_CXX11_HAS_DELETED_FUNCTIONS
 TEST_CASE("variant<NonAssignable>::swap(variant<...>&)", "[variant.swap]")
 {
     eggs::variant<int, NonAssignable> v1(42);
@@ -380,7 +375,7 @@ TEST_CASE("variant<NonAssignable>::swap(variant<...>&)", "[variant.swap]")
     CHECK(v1.which() == 1u);
     CHECK(v2.which() == 0u);
 
-#if EGGS_CXX11_HAS_DEFAULTED_FUNCTIONS && EGGS_CXX11_STD_HAS_IS_TRIVIALLY_COPYABLE
+#if EGGS_CXX11_STD_HAS_IS_TRIVIALLY_COPYABLE
     // trivially_copyable
     {
         eggs::variant<int, NonAssignableTrivial> v1(42);
@@ -398,7 +393,6 @@ TEST_CASE("variant<NonAssignable>::swap(variant<...>&)", "[variant.swap]")
     }
 #endif
 }
-#endif
 
 TEST_CASE("variant<>::swap(variant<>&)", "[variant.swap]")
 {
@@ -415,9 +409,7 @@ TEST_CASE("variant<>::swap(variant<>&)", "[variant.swap]")
     CHECK(v1.which() == npos);
     CHECK(v2.which() == npos);
 
-#if EGGS_CXX11_HAS_NOEXCEPT
     CHECK((noexcept(v2.swap(v1)) == true));
-#endif
 
 #if EGGS_CXX14_HAS_CONSTEXPR
     // constexpr

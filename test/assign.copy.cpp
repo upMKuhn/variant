@@ -40,7 +40,6 @@ struct MovableOnly
     MovableOnly& operator=(MovableOnly&&) { return *this; }
 };
 
-#  if EGGS_CXX11_HAS_DELETED_FUNCTIONS
 struct NonCopyAssignable
 {
     NonCopyAssignable() {}
@@ -55,15 +54,12 @@ struct NonCopyConstructible
     NonCopyConstructible& operator=(NonCopyConstructible const&) { return *this; }; // not trivially copyable
 };
 
-#    if EGGS_CXX11_HAS_DEFAULTED_FUNCTIONS
 struct NonCopyAssignableTrivial
 {
     NonCopyAssignableTrivial() {}
     NonCopyAssignableTrivial(NonCopyAssignableTrivial const&) = default;
     NonCopyAssignableTrivial& operator=(NonCopyAssignableTrivial const&) = delete;
 };
-#    endif
-#  endif
 #endif
 
 TEST_CASE("variant<Ts...>::operator=(variant<Ts...> const&)", "[variant.assign]")
@@ -358,8 +354,6 @@ TEST_CASE("variant<Ts...>::operator=(variant<Ts...> const&)", "[variant.assign]"
             !std::is_copy_assignable<
                 eggs::variant<MovableOnly>
             >::value));
-
-#  if EGGS_CXX11_HAS_DELETED_FUNCTIONS
         CHECK((
             !std::is_copy_assignable<
                 eggs::variant<NonCopyAssignable>
@@ -368,13 +362,10 @@ TEST_CASE("variant<Ts...>::operator=(variant<Ts...> const&)", "[variant.assign]"
             !std::is_copy_assignable<
                 eggs::variant<NonCopyConstructible>
             >::value));
-#    if EGGS_CXX11_HAS_DEFAULTED_FUNCTIONS
         CHECK((
             !std::is_copy_assignable<
                 eggs::variant<NonCopyAssignableTrivial>
             >::value));
-#    endif
-#  endif
 #endif
     }
 }
